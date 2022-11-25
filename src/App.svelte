@@ -8,9 +8,13 @@
 	let interval
 	let isPending = false
 
+	const startTimer = () => {
+		interval && clearInterval(interval);
+		interval = setInterval(fetchCard, 30000)
+	}
+
 	const fetchCard = async () => {
 		try {
-			clearInterval(interval)
 			isPending = true
 			const response = await fetchCardApi()
 			if (response) cards = [...cards, response]
@@ -21,10 +25,14 @@
 		}
 	};
 
-	onMount(() => {
+	const onFetch = () => {
 		fetchCard()
-		interval = setInterval(fetchCard, 30000)
-		return () => clearInterval(interval);
+		startTimer()
+	}
+
+	onMount(() => {
+		onFetch()
+		return () => interval && clearInterval(interval);
 	});
 
 </script>
@@ -40,7 +48,7 @@
 			/>
 		{/each}
 	</div>
-	<Button disabled={isPending} onClick={fetchCard}/>
+	<Button disabled={isPending} onClick={onFetch}/>
 </main>
 
 <style>
